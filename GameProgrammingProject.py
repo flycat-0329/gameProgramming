@@ -1,12 +1,21 @@
 import random
 import sys
 import time
+import tkinter
+from tkinter import *
 
 cookingList = ["제육볶음", "잔치국수", "마늘빵", "볶음밥", "떡볶이", "치킨"]    #요리 제목 리스트
-resourceList = ["돼지고기", "어묵", "밀가루", "국물용멸치", "어묵", "계란", "소면", "닭고기", "떡", "바게트", "소고기", "밥", 
-                "소세지", "빵가루", "양파", "대파", "밥", "김치", "당근", "식용유"]   #요리 재료 리스트
+resourceList = ["돼지고기", "어묵", "밀가루", "국물용멸치", "계란", "소면", "닭고기", "떡", "바게트", "소고기", "밥", 
+                "소세지", "빵가루", "양파", "대파", "김치", "당근", "식용유"]   #요리 재료 리스트
 sauceList = ["고추장", "간장", "버터", "후추", "고춧가루", "다시다", "소금", "다진마늘"]      #조미료 리스트
 bowlList = ["양은그릇", "유리볼", "넓은접시", "기름종이"]       #그릇 리스트
+curLife = 3
+curCook = "제육볶음"
+
+selectResourceList = []
+selectSauceList = []
+selectBowl = ""
+win = None
 
 #요리 제목: [[재료], [조미료], []] string: string 이중 리스트 딕셔너리
 recipeDict = {"제육볶음": [["돼지고기", "대파", "양파", "당근"], ["고추장", "고춧가루", "간장", "후추"], ["넓은접시"]], 
@@ -18,25 +27,150 @@ recipeDict = {"제육볶음": [["돼지고기", "대파", "양파", "당근"], [
 
 cooking = "" #현재 요리중인 요리 이름
 
-def recipePrint(cookName):
-    a = 0
-    print("재료", end = ": ")
-    for a in range(0, len(recipeDict[cookName][0])):
-        if a != len(recipeDict[cookName][0]) - 1:
-            print(recipeDict[cookName][0][a], end = ", ")
-        else:
-            print(recipeDict[cookName][0][a])
+def clear_grid(frame):
+    # 현재 그리드에 배치된 모든 위젯을 가져와서 삭제
+    for widget in frame.grid_slaves():
+        widget.grid_forget()
+
+def resourceTkinter():
+    global resourceList
+    global selectSauceList
+    global curCook
+    global win
+
+    clear_grid(win)
+
+    te = tkinter.Label(win, text=curCook, width=75, height=2, anchor="center")
+    te.grid(row=0, column=0, columnspan=5)
+
+    t = Text()
+    t.delete("1.0", "end")
+    t.grid(row=5, column=0, columnspan=5, sticky="we")
+
+    for b in range(0, 4):
+        for c in range(0, 5):
+            try:
+                btn = tkinter.Button(win, text = (resourceList[b * 5 + c].center(10)) , background = 'white', 
+                                     height=4, width=15, command = lambda text=resourceList[b * 5 + c] : resourceSelect(text, t))
+                btn.grid(row = b + 1, column=c)
+            except IndexError:
+                if (b * 5 + c) == 18:
+                    btn = tkinter.Button(win, text="다음", background="white", height=4, width=30, 
+                                         command=sauceTkinter)
+                    btn.grid(row=4, column=3, columnspan=2, sticky="we")
+
+    win.mainloop()
+
+def resourceSelect(text, t):
+    global selectResourceList
+
+    if text not in selectResourceList:
+        selectResourceList.append(text)
+    else:
+        selectResourceList.remove(text)
     
-    a = 0
-    print("조미료", end = ": ")
-    for a in range(0, len(recipeDict[cookName][1])):
-        if a != len(recipeDict[cookName][1]) - 1:
-            print(recipeDict[cookName][1][a], end = ", ")
-        else:
-            print(recipeDict[cookName][1][a])
+    t.delete("1.0", "end")
+    t.insert(END, ", ".join(selectResourceList))
+    t.grid(row=5, column=0, columnspan=5, sticky="we")
 
-    print(recipeDict[cookName][2][0] + "에 담아내 마무리한다.")
+def sauceTkinter():
+    global sauceList
+    global selectSauceList
+    global curCook
+    global win
 
+    clear_grid(win)
+    
+    te = tkinter.Label(win, text=curCook, width=50, height=2, anchor="center")
+    te.grid(row=0, column=0, columnspan=4, sticky="we")
+
+    t = Text()
+    t.delete("1.0", "end")
+    t.grid(row=4, column=0, columnspan=4, sticky="we")
+
+    for b in range(0, 2):
+        for c in range(0, 4):
+            try:
+                btn = tkinter.Button(win, text = (sauceList[b * 4 + c].center(10)) , background = 'white', 
+                                        height=4, width=15, command = lambda text=sauceList[b * 4 + c] : sauceSelect(text, t))
+                btn.grid(row = b + 1, column=c, sticky="we")
+            except IndexError:
+                pass
+            
+    btn = tkinter.Button(win, text="이전", background="white", height=4, width=15, command=resourceTkinter)
+    btn.grid(row=3, column=0, sticky="w")
+    
+    win.grid_columnconfigure(2)
+
+    btn = tkinter.Button(win, text="다음", background="white", height=4, width=15, command=bowlTkinter)
+    btn.grid(row=3, column=3, sticky="e")
+
+    win.mainloop()
+
+def sauceSelect(text, t):
+    global selectSauceList
+
+    if text not in selectSauceList:
+        selectSauceList.append(text)
+    else:
+        selectSauceList.remove(text)
+    
+    t.delete("1.0", END)
+    t.insert(END, ", ".join(selectSauceList))
+    t.grid(row=4, column=0, columnspan=4, sticky="we")
+
+def bowlTkinter():
+    global bowlList
+    global selectBowl
+    global curCook
+    global win
+
+    clear_grid(win)
+    
+    te = tkinter.Label(win, text=curCook, width=50, height=2, anchor="center")
+    te.grid(row=0, column=0, columnspan=4, sticky="we")
+
+    t = Text()
+    t.delete("1.0", END)
+    t.grid(row=3, column=0, columnspan=4, sticky="wens")
+
+    for c in range(0, 4):
+        try:
+            btn = tkinter.Button(win, text = (bowlList[c].center(10)) , background = 'white', 
+                                    height=4, width=15, command = lambda text=bowlList[c] : bowlSelect(text, t))
+            btn.grid(row = 1, column=c, sticky="we")
+        except IndexError:
+            pass
+            
+    btn = tkinter.Button(win, text="이전", background="white", height=4, width=15, command=sauceTkinter)
+    btn.grid(row=2, column=0, sticky="w")
+    
+    win.grid_columnconfigure(2)
+
+    btn = tkinter.Button(win, text="제출", background="white", height=4, width=15, command="")
+    btn.grid(row=2, column=3, sticky="e")
+
+    win.mainloop()
+
+def bowlSelect(text, t):
+    global selectBowl
+
+    selectBowl = text
+    
+    t.delete("1.0", END)
+    t.insert(END, selectBowl)
+    t.grid(row=3, column=0, columnspan=4, sticky="wens")
+
+def mainGame():
+    global curCook
+    
+    while True:
+        curCook = random.choice(cookingList)
+        print(curCook + " 내 놔!")
+        print()
+        print("요리를 만들 식재료를 고르세요!")
+
+#인트로
 def introFirst():
     print("여기 8연강을 마친 뒤 지치고 힘들고 찝찝하고 불쾌하고 아무튼 부정적인 정재웅이 있습니다.")
     time.sleep(1.5)
@@ -62,8 +196,10 @@ while True:
     
     a = input("번호를 입력하세요: ")
     if a == "1":
-        cook = input("요리")
-        recipePrint(cook)
+        win = tkinter.Tk()
+        win.geometry("800x600+100+100")
+        win.resizable(False, False)
+        resourceTkinter()
     elif a == "2":
        introFirst()
     elif a == "3":
