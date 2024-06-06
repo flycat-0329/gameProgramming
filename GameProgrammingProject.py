@@ -1,6 +1,7 @@
 import random
 import sys
 import time
+import os
 import tkinter
 from tkinter import *
 
@@ -16,6 +17,7 @@ selectResourceList = []
 selectSauceList = []
 selectBowl = ""
 win = None
+isSuccess = 0
 
 #요리 제목: [[재료], [조미료], []] string: string 이중 리스트 딕셔너리
 recipeDict = {"제육볶음": [["돼지고기", "대파", "양파", "당근"], ["고추장", "고춧가루", "간장", "후추"], ["넓은접시"]], 
@@ -147,7 +149,7 @@ def bowlTkinter():
     
     win.grid_columnconfigure(2)
 
-    btn = tkinter.Button(win, text="제출", background="white", height=4, width=15, command="")
+    btn = tkinter.Button(win, text="제출", background="white", height=4, width=15, command=cookCheck)
     btn.grid(row=2, column=3, sticky="e")
 
     win.mainloop()
@@ -163,15 +165,43 @@ def bowlSelect(text, t):
 
 def mainGame():
     global curCook
+
+    curCook = random.choice(cookingList)
+    print(curCook + " 내 놔!")
+    print()
+    print("요리를 만들 식재료를 고르세요!")
+    input("엔터 키를 누르면 시작합니다")
+
+def cookCheck():
+    global selectResourceList
+    global selectSauceList
+    global selectBowl
+    global curCook
+    global recipeDict
+    global win
+    global isSuccess
+
+    win.destroy()
+
+    for a in selectResourceList:
+        if a not in recipeDict[curCook][0] or len(selectResourceList) != len(recipeDict[curCook][0]):
+            isSuccess = 1
+            return
     
-    while True:
-        curCook = random.choice(cookingList)
-        print(curCook + " 내 놔!")
-        print()
-        print("요리를 만들 식재료를 고르세요!")
+    for a in selectSauceList:
+        if a not in recipeDict[curCook][1] or len(selectSauceList) != len(recipeDict[curCook][1]):
+            isSuccess = 2
+            return
+    
+    if selectBowl != recipeDict[curCook][2][0]:
+        isSuccess = 3
+        return
+
+    isSuccess = 4
 
 #인트로
 def introFirst():
+    os.system("cls")
     print("여기 8연강을 마친 뒤 지치고 힘들고 찝찝하고 불쾌하고 아무튼 부정적인 정재웅이 있습니다.")
     time.sleep(1.5)
     print("이 때, 눈 앞에 안수형의 집이 보이는군요")
@@ -186,8 +216,12 @@ def introFirst():
     print("이제부터 여러분은 안수형씨가 되어 정재웅에게 밥을 차려줘야합니다.")
     print("과연 여러분은 배고픈 정재웅을 만족시킬 수 있을까요?")
     print("부디 행운을 빕니다.")
+    print()
+    print("엔터 키를 눌러서 진행하세요")
+    input("")
 
 while True:
+    os.system("cls")
     print()
     print("1. 게임시작")
     print("2. 게임설명")
@@ -196,17 +230,50 @@ while True:
     
     a = input("번호를 입력하세요: ")
     if a == "1":
+        mainGame()
+        selectResourceList = []
+        selectSauceList = []
+        selectBowl = ""
+
         win = tkinter.Tk()
         win.geometry("800x600+100+100")
         win.resizable(False, False)
         resourceTkinter()
+        os.system("cls")
+
+        if isSuccess == 1:
+            print("아니 이게 뭐야!")
+            print(f"누가 {curCook}에 이런걸 넣어!")
+            print("당장 이 집에서 나가!!")
+            break
+        elif isSuccess == 2:
+            print("아니 이게 뭐야!")
+            print(f"왜 {curCook}에서 이딴 맛이 나!")
+            print("당장 이 집에서 나가!!")
+            break
+        elif isSuccess == 3:
+            print("아니 이게 뭐야!")
+            print(f"누가 {curCook}을 이딴 접시에 담아!")
+            print("당장 이 집에서 나가!!")
+            break
+        elif isSuccess == 4:
+            print("음 맛있는 밥을 만들었구만")
+            print("약속한대로 집은 남겨두지")
+            break
+        else:
+            print("버그가 났으니 프로그램을 종료해주세요.")
+        
     elif a == "2":
        introFirst()
     elif a == "3":
+        os.system("cls")
         print()
         print("프로그래밍 및 팀장: 송선")
         print("기획 및 출연: 정재웅")
         print("발표 및 늘 밥을 해준 사람: 안수형")
+        print()
+        print("엔터 키를 눌러서 진행하세요")
+        input("")
     elif a == "4":
         sys.exit()
     else:
