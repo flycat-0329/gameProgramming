@@ -22,7 +22,7 @@ isSuccess = 0
 #요리 제목: [[재료], [조미료], []] string: string 이중 리스트 딕셔너리
 recipeDict = {"제육볶음": [["돼지고기", "대파", "양파", "당근"], ["고추장", "고춧가루", "간장", "후추"], ["넓은접시"]], 
               "잔치국수": [["소면", "당근", "계란", "국물용멸치"], ["다시다", "간장", "소금", "후추"], ["양은그릇"]],
-              "마늘빵": [["다진마늘", "빵"], ["버터", "꿀"], ["기름종이"]],
+              "마늘빵": [["다진마늘", "바게트"], ["버터", "꿀"], ["기름종이"]],
               "볶음밥": [["대파", "양파", "당근", "계란", "소세지", "밥", "식용유"], ["소금", "후추"], ["기름종이"]],
               "떡볶이": [["떡", "어묵", "양파", "대파"], ["고추장", "고춧가루", "간장", "소금", "후추", "다시다"], ["넓은접시"]],
               "치킨": [["닭고기", "밀가루", "빵가루", "식용유"], ["소금"], ["기름종이"]]}     
@@ -47,6 +47,7 @@ def resourceTkinter():
 
     t = Text()
     t.delete("1.0", "end")
+    t.insert(END, ", ".join(selectResourceList))
     t.grid(row=5, column=0, columnspan=5, sticky="we")
 
     for b in range(0, 4):
@@ -88,6 +89,7 @@ def sauceTkinter():
 
     t = Text()
     t.delete("1.0", "end")
+    t.insert(END, ", ".join(selectSauceList))
     t.grid(row=4, column=0, columnspan=4, sticky="we")
 
     for b in range(0, 2):
@@ -134,6 +136,7 @@ def bowlTkinter():
 
     t = Text()
     t.delete("1.0", END)
+    t.insert(END, selectBowl)
     t.grid(row=3, column=0, columnspan=4, sticky="wens")
 
     for c in range(0, 4):
